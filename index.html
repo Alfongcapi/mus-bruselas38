@@ -296,6 +296,9 @@ body{font-family:'Inter',sans-serif;background:var(--vd);color:var(--blanco);min
 .regl-pav img{width:100%;height:100%;object-fit:cover;object-position:center top;}
 .regl-pname{font-size:13px;font-weight:700;flex:1;}
 .regl-pdate{font-size:11px;color:rgba(255,255,255,0.35);}
+.sanc-btn{width:100%;margin-top:10px;padding:11px;border:none;border-radius:10px;background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;font-weight:700;font-size:13px;letter-spacing:.5px;cursor:pointer;}
+.sanc-btn:disabled{opacity:.5;}
+.sanc-tag{display:inline-block;background:rgba(231,76,60,0.18);color:#ff8a80;border:1px solid rgba(231,76,60,0.4);border-radius:8px;padding:2px 8px;font-size:9px;font-weight:700;letter-spacing:.5px;}
 .regl-pbadge{font-size:11px;padding:3px 10px;border-radius:10px;font-weight:600;flex-shrink:0;}
 .regl-pbadge.ok{background:rgba(58,175,92,0.12);color:var(--va);border:1px solid rgba(58,175,92,0.2);}
 .regl-pbadge.warn{background:rgba(230,126,34,0.12);color:#f0a050;border:1px solid rgba(230,126,34,0.25);}
@@ -881,7 +884,7 @@ function renderReglamento(){
         '</div>'+
       '</div>';
     })();
-    return '<div class="regl-player-row" style="flex-wrap:wrap;"><div class="regl-pav">'+avHTML(p.name)+'</div><div style="flex:1;min-width:0;"><div class="regl-pname">'+p.name+'</div><div class="regl-pdate">Último: '+dateStr+'</div></div><span class="regl-pbadge '+badgeClass+'">'+badge+'</span>'+(bar?'<div style="width:100%;flex-basis:100%;">'+bar+'</div>':'')+'</div>';
+    return '<div class="regl-player-row" style="flex-wrap:wrap;"><div class="regl-pav">'+avHTML(p.name)+'</div><div style="flex:1;min-width:0;"><div class="regl-pname">'+p.name+'</div><div class="regl-pdate">Último: '+dateStr+'</div></div><span class="regl-pbadge '+badgeClass+'">'+badge+'</span>'+(bar?'<div style="width:100%;flex-basis:100%;">'+bar+'</div>':'')+(p.days!==null&&p.days>=21?'<div style="width:100%;flex-basis:100%;"><button class="sanc-btn" onclick="ejecutarSancion(\''+p.name+'\',this)">⚖️ EJECUTAR SANCIÓN</button></div>':'')+'</div>';
   }).join('')+'</div>';
 }
 
@@ -1267,7 +1270,7 @@ function renderPartidas(){
   if(!rows.length){ab.innerHTML='';ml.innerHTML='<div class="empty-matches">🃏<br><br>No hay partidas registradas aún.</div>';return;}
   const lastRow=rows[rows.length-1];const days=daysSince(lastRow.fecha);
   if(days!==null&&days>=14){const left=21-days;if(days>=21)ab.innerHTML='<div class="alert-banner danger"><div class="alert-icon">🚨</div><div class="alert-text"><strong>¡'+days+' días sin jugar!</strong>Habéis superado el límite de 3 semanas.</div></div>';else ab.innerHTML='<div class="alert-banner warning"><div class="alert-icon">⚠️</div><div class="alert-text"><strong>'+left+' días para el límite</strong>Lleváis '+days+' días sin jugar.</div></div>';}else ab.innerHTML='';
-  ml.innerHTML=[...rows].reverse().slice(0,30).map((row,ri)=>{const idx=rows.length-1-ri;const p1w=row.ganador==='Pareja 1';const d=daysSince(row.fecha);const ago=agoLabel(d);const ds=row.fecha?fmtDate(row.fecha):'—';return '<div class="mcard" onclick="openMatch('+idx+')"><div class="mmeta"><span class="mmeta-date">'+ds+'</span><span class="mmeta-ago '+ago.c+'">'+ago.t+'</span></div><div class="mbody"><div class="mteam"><div class="mnames '+(p1w?'win':'')+'">'+row.p1a+'<br>'+row.p1b+'</div>'+(p1w?'<span class="wtag">GANADORES</span>':'')+'</div><div class="mscorec"><div class="mscore">'+row.pts1+'<span style="color:rgba(255,255,255,0.2);font-size:14px"> · </span>'+row.pts2+'</div><div class="mscore-lbl">PTS</div></div><div class="mteam-r"><div class="mnames '+(!p1w?'win':'')+'"><span style="display:block;text-align:right">'+row.p2a+'</span><span style="display:block;text-align:right">'+row.p2b+'</span></div>'+(!p1w?'<div style="text-align:right"><span class="wtag">GANADORES</span></div>':'')+'</div></div>'+(row.registradaPor?'<div style="text-align:right;font-size:9px;color:rgba(255,255,255,0.22);padding:2px 4px 0;">Registrada por '+row.registradaPor+'</div>':'')+'</div>';}).join('');
+  ml.innerHTML=[...rows].reverse().slice(0,30).map((row,ri)=>{const idx=rows.length-1-ri;const p1w=row.ganador==='Pareja 1';const d=daysSince(row.fecha);const ago=agoLabel(d);const ds=row.fecha?fmtDate(row.fecha):'—';return '<div class="mcard" onclick="openMatch('+idx+')"><div class="mmeta"><span class="mmeta-date">'+ds+'</span><span class="mmeta-ago '+ago.c+'">'+ago.t+'</span></div><div class="mbody"><div class="mteam"><div class="mnames '+(p1w?'win':'')+'">'+row.p1a+'<br>'+row.p1b+'</div>'+(p1w?'<span class="wtag">GANADORES</span>':'')+'</div><div class="mscorec"><div class="mscore">'+row.pts1+'<span style="color:rgba(255,255,255,0.2);font-size:14px"> · </span>'+row.pts2+'</div><div class="mscore-lbl">PTS</div></div><div class="mteam-r"><div class="mnames '+(!p1w?'win':'')+'"><span style="display:block;text-align:right">'+row.p2a+'</span><span style="display:block;text-align:right">'+row.p2b+'</span></div>'+(!p1w?'<div style="text-align:right"><span class="wtag">GANADORES</span></div>':'')+'</div></div>'+(isSancion(row)?'<div style="text-align:right;padding:4px 4px 0;"><span class="sanc-tag">⚖️ PARTIDA DE SANCIÓN</span></div>':(row.registradaPor?'<div style="text-align:right;font-size:9px;color:rgba(255,255,255,0.22);padding:2px 4px 0;">Registrada por '+row.registradaPor+'</div>':''))+'</div>';}).join('');
 }
 
 let statsSeason='2026-2027';
@@ -1707,7 +1710,7 @@ function openPlayerMatches(name, type){
 }
 function openMatch(idx){
   const row=rows[idx];if(!row)return;const p1w=row.ganador==='Pareja 1';const d=daysSince(row.fecha);const ago=agoLabel(d);
-  document.getElementById('mm-date').textContent=(row.fecha?fmtDate(row.fecha):'—')+' · '+ago.t;
+  document.getElementById('mm-date').textContent=(row.fecha?fmtDate(row.fecha):'—')+' · '+ago.t+(isSancion(row)?' · ⚖️ Partida de sanción':'');
   document.getElementById('mm-teams').innerHTML='<div class="mdtteam"><div class="mdtnames '+(p1w?'win':'')+'">'+row.p1a+'<br>'+row.p1b+'</div>'+(p1w?'<div class="mdtwl">✓ GANADORES</div>':'')+'</div><div><div class="mdtscore">'+row.pts1+' · '+row.pts2+'</div><div class="mdtlbl">PUNTOS</div></div><div class="mdtteam" style="text-align:right"><div class="mdtnames '+(!p1w?'win':'')+'">'+row.p2a+'<br>'+row.p2b+'</div>'+(!p1w?'<div class="mdtwl">✓ GANADORES</div>':'')+'</div>';
   document.getElementById('matchModal').classList.add('open');
 }
@@ -1806,6 +1809,25 @@ function selW(n){
   document.getElementById('wb2').classList.toggle('sel',n===2);
   const hint=document.getElementById('winner-hint');
   if(hint)hint.style.display='none';
+}
+
+const isSancion=r=>/^SANCI/i.test(r&&r.registradaPor||'');
+async function ejecutarSancion(name,btn){
+  if(!confirm('¿Ejecutar sanción a '+name+'?\n\nSe registrarán 3 partidas perdidas 0-3:\n'+name+' + Castigo vs Castigo + Castigo'))return;
+  if(btn){btn.disabled=true;btn.textContent='⏳ Registrando sanción...';}
+  const data={p1a:name,p1b:'Castigo',p2a:'Castigo',p2b:'Castigo',ganador:'Pareja 2',pts1:0,pts2:3,
+    registradaPor:'SANCIÓN'+(currentPlayer?' · '+currentPlayer:'')};
+  try{
+    for(let i=0;i<3;i++){
+      await fetch(SCRIPT,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+      await new Promise(r=>setTimeout(r,1200));
+    }
+    showToast('⚖️ Sanción ejecutada: 3 partidas perdidas a '+name,'ok');
+    setTimeout(async()=>{await loadSheet();renderReglamento();},3000);
+  }catch(err){
+    if(btn){btn.disabled=false;btn.textContent='⚖️ EJECUTAR SANCIÓN';}
+    showToast('⚠️ Error al registrar la sanción','err');
+  }
 }
 
 async function submitForm(){
