@@ -368,6 +368,31 @@ body{font-family:'Inter',sans-serif;background:var(--vd);color:var(--blanco);min
 .welcome-av img{width:100%;height:100%;object-fit:cover;object-position:center top;}
 .welcome-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:900;color:#fff;margin-bottom:6px;}
 .welcome-name{font-family:'Oswald',sans-serif;font-size:36px;font-weight:700;color:var(--va);margin-bottom:8px;}
+.pass-wrap{position:relative;width:100%;}
+.pass-wrap .login-input{padding-left:44px;padding-right:44px;}
+.pass-eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:20px;padding:6px 8px;cursor:pointer;opacity:.7;}
+.remember-row{display:flex;align-items:center;justify-content:center;gap:8px;margin:12px 0 4px;font-size:13px;color:rgba(255,255,255,0.75);cursor:pointer;user-select:none;}
+.remember-row input{width:18px;height:18px;accent-color:#3aaf5c;cursor:pointer;}
+.forget-dev{margin-top:14px;font-size:11px;color:rgba(255,255,255,0.4);text-align:center;cursor:pointer;text-decoration:underline;}
+.sanc-ov{position:fixed;inset:0;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;padding:16px;z-index:9999;box-sizing:border-box;}
+.sanc-box{width:100%;max-width:380px;max-height:90vh;overflow-y:auto;background:#14281c;border:1px solid rgba(231,76,60,0.45);border-radius:16px;padding:18px 16px;box-sizing:border-box;color:#fff;text-align:center;}
+.sanc-av{width:64px;height:64px;border-radius:50%;overflow:hidden;margin:0 auto 8px;border:2px solid #e74c3c;}
+.sanc-av img{width:100%;height:100%;object-fit:cover;}
+.sanc-tit{font-family:'Oswald',sans-serif;font-size:20px;font-weight:700;color:#ff8a80;letter-spacing:.5px;}
+.sanc-sub{font-size:13px;color:rgba(255,255,255,0.75);margin:6px 0 12px;line-height:1.4;}
+.sanc-m{display:flex;align-items:center;gap:6px;background:rgba(0,0,0,0.25);border-radius:10px;padding:8px 10px;margin-bottom:6px;font-size:12px;}
+.sanc-m .t{flex:1;min-width:0;line-height:1.3;}
+.sanc-m .t.r{text-align:right;color:rgba(255,255,255,0.55);}
+.sanc-m .sc{font-family:'Oswald',sans-serif;font-size:16px;font-weight:700;white-space:nowrap;}
+.sanc-m .sc b{color:#e57373;}
+.sanc-res{display:flex;gap:6px;margin:12px 0 4px;}
+.sanc-res div{flex:1;background:rgba(231,76,60,0.12);border:1px solid rgba(231,76,60,0.3);border-radius:10px;padding:8px 4px;font-size:10px;color:rgba(255,255,255,0.6);}
+.sanc-res strong{display:block;font-family:'Oswald',sans-serif;font-size:18px;color:#ff8a80;}
+.sanc-note{font-size:11px;color:rgba(255,255,255,0.45);margin:8px 0 14px;line-height:1.4;}
+.sanc-acts{display:flex;gap:8px;}
+.sanc-acts button{flex:1;padding:12px;border-radius:10px;border:none;font-weight:700;font-size:13px;cursor:pointer;}
+.sanc-cancel{background:rgba(255,255,255,0.1);color:#fff;}
+.sanc-ok{background:linear-gradient(135deg,#c0392b,#e74c3c);color:#fff;}
 </style>
 </head>
 <body id="app-body" style="overflow:hidden;">
@@ -379,6 +404,9 @@ function checkPass(){
   var p=(inp.value||'').trim().toLowerCase();
   if(p==='claudio'){
     if(err)err.style.display='none';
+    var rm=document.getElementById('remember-dev');
+    if(rm&&rm.checked){try{localStorage.setItem('musDevice38','1');}catch(e){}}
+    var fd=document.getElementById('forget-dev');if(fd)fd.style.display=(rm&&rm.checked)?'block':'none';
     var s1=document.getElementById('login-step1');
     var s2=document.getElementById('login-step2');
     if(s1)s1.style.display='none';
@@ -387,6 +415,21 @@ function checkPass(){
     if(err)err.style.display='block';
     inp.value='';
   }
+}
+function togglePass(){
+  var i=document.getElementById('login-pass'),b=document.getElementById('pass-eye');
+  if(!i)return;var show=i.type==='password';i.type=show?'text':'password';
+  if(b)b.textContent=show?'🙈':'👁️';
+}
+function devRemembered(){try{return localStorage.getItem('musDevice38')==='1';}catch(e){return false;}}
+function showStep2(){
+  var s1=document.getElementById('login-step1'),s2=document.getElementById('login-step2'),fd=document.getElementById('forget-dev');
+  if(s1)s1.style.display='none';if(s2)s2.style.display='block';if(fd)fd.style.display='block';
+}
+function forgetDevice(){
+  try{localStorage.removeItem('musDevice38');}catch(e){}
+  var s1=document.getElementById('login-step1'),s2=document.getElementById('login-step2'),lp=document.getElementById('login-pass');
+  if(lp)lp.value='';if(s2)s2.style.display='none';if(s1)s1.style.display='block';
 }
 function selectLoginPlayer(name){
   currentPlayer=name;
@@ -432,7 +475,8 @@ function showWelcome(name){
   </div>
   <div class="login-box" id="login-step1">
     <div class="login-label">Contraseña de la liga</div>
-    <input class="login-input" id="login-pass" type="password" placeholder="••••••" maxlength="20" onkeydown="if(event.key==='Enter')checkPass()">
+    <div class="pass-wrap"><input class="login-input" id="login-pass" type="password" placeholder="••••••" maxlength="20" onkeydown="if(event.key==='Enter')checkPass()"><button type="button" class="pass-eye" id="pass-eye" onclick="togglePass()" aria-label="Mostrar contraseña">👁️</button></div>
+    <label class="remember-row"><input type="checkbox" id="remember-dev" checked> Recordar este dispositivo</label>
     <button class="login-btn" onclick="checkPass()">ENTRAR →</button>
     <div class="login-err" id="login-err">¡Te equivocaste de contraseña, friki!</div>
   </div>
@@ -466,6 +510,7 @@ function showWelcome(name){
     </div>
     </div>
     <div class="login-err" id="login-err2">Selecciona tu jugador</div>
+    <div class="forget-dev" id="forget-dev" onclick="forgetDevice()" style="display:none;">🔓 Olvidar este dispositivo</div>
   </div>
 </div>
 
@@ -1812,8 +1857,26 @@ function selW(n){
 }
 
 const isSancion=r=>/^SANCI/i.test(r&&r.registradaPor||'');
-async function ejecutarSancion(name,btn){
-  if(!confirm('¿Ejecutar sanción a '+name+'?\n\nSe registrarán 3 partidas perdidas 0-3:\n'+name+' + Castigo vs Castigo + Castigo'))return;
+let _sancBtn=null;
+function ejecutarSancion(name,btn){
+  _sancBtn=btn;
+  const old=document.getElementById('sanc-ov');if(old)old.remove();
+  const av=(typeof LPHOTOS!=='undefined'&&LPHOTOS[name])?'<div class="sanc-av"><img src="'+LPHOTOS[name]+'"></div>':'<div style="font-size:40px;margin-bottom:6px;">⚖️</div>';
+  const m='<div class="sanc-m"><div class="t"><strong>'+name+'</strong><br>+ Castigo</div><div class="sc"><b>0</b> – 3</div><div class="t r">Castigo<br>+ Castigo</div></div>';
+  const ov=document.createElement('div');ov.id='sanc-ov';ov.className='sanc-ov';
+  ov.innerHTML='<div class="sanc-box">'+av+
+    '<div class="sanc-tit">⚖️ EJECUTAR SANCIÓN</div>'+
+    '<div class="sanc-sub"><strong>'+name+'</strong> lleva más de 3 semanas sin jugar. Se le añadirán <strong>3 partidas perdidas</strong>:</div>'+
+    m+m+m+
+    '<div class="sanc-res"><div><strong>+3</strong>jugadas</div><div><strong>+3</strong>derrotas</div><div><strong>0</strong>juegos</div></div>'+
+    '<div class="sanc-note">Juega con un Castigo contra dos Castigos y pierde 3-0 las tres. Cuentan en clasificación y %ᵀ y aparecerán como <strong>partida de sanción</strong>. Su contador de días vuelve a cero.</div>'+
+    '<div class="sanc-acts"><button class="sanc-cancel" onclick="document.getElementById(\'sanc-ov\').remove()">Cancelar</button><button class="sanc-ok" onclick="document.getElementById(\'sanc-ov\').remove();_doSancion(\''+name+'\')">Confirmar sanción</button></div>'+
+  '</div>';
+  ov.addEventListener('click',e=>{if(e.target===ov)ov.remove();});
+  document.body.appendChild(ov);
+}
+async function _doSancion(name){
+  const btn=_sancBtn;
   if(btn){btn.disabled=true;btn.textContent='⏳ Registrando sanción...';}
   const data={p1a:name,p1b:'Castigo',p2a:'Castigo',p2b:'Castigo',ganador:'Pareja 2',pts1:0,pts2:3,
     registradaPor:'SANCIÓN'+(currentPlayer?' · '+currentPlayer:'')};
@@ -1905,6 +1968,7 @@ window.addEventListener('load', ()=>{
   });
   const saved=sessionStorage.getItem('musPlayer38');
   if(saved){ currentPlayer=saved; hidLogin(); updUser(saved); }
+  else if(devRemembered()){ showStep2(); }
 });
 
 function _checkPassReal(){
@@ -1964,6 +2028,7 @@ function _logout(){
   document.getElementById('login-err').style.display='none';
   document.getElementById('login-step1').style.display='block';
   document.getElementById('login-step2').style.display='none';
+  if(devRemembered())showStep2();
   const ls=document.getElementById('login-screen');if(ls)ls.style.display='flex';
   const b=document.getElementById('app-body');if(b)b.style.overflow='hidden';
 }
